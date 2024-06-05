@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Joshua-Russel/bookings/pkg/config"
 	"github.com/Joshua-Russel/bookings/pkg/models"
 	"github.com/Joshua-Russel/bookings/pkg/render"
+	"log"
 	"net/http"
 )
 
@@ -57,4 +59,22 @@ func (repo *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 
 	n, _ := w.Write([]byte(fmt.Sprintf("the check in date is %s and check out date is %s", cin, cout)))
 	fmt.Println(n)
+}
+
+type jsonData struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
+
+func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	data := jsonData{
+		OK:      true,
+		Message: "Available",
+	}
+	js, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		log.Println(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }

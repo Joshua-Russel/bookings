@@ -41,7 +41,6 @@
            <form action="" class="needs-validation" novalidate id="check-availability-form" method="post">
                 <div class="row mb-3">
                     <div class="col">
-                    <h1>Choose your dates</h1>
                         <div class="row px-5 pt-3"  id="reservation-dates-modal">
                             <div class="col">
 
@@ -59,7 +58,22 @@
                 </div>
         </form>
                 `
-            attention.datePicker({msg:html});
+            attention.datePicker({
+                msg:html,
+                title:"Choose your dates",
+                callback:function(result){
+                    const form=document.getElementById("check-availability-form")
+                    const formData=new FormData(form)
+                    formData.append("csrf_token","{{.CSRFToken}}")
+                    fetch("/srch-availability-json",{
+                        method:"post",
+                        body:formData,
+                    })
+                        .then(request => request.json())
+                        .then(data => console.log(data))
+                }
+            });
+
         })
         // function notify(title,text,icon,confirmText) {
         //     Swal.fire({
@@ -134,7 +148,7 @@
                     msg="",
                     title="",
                 }=c;
-                const { value: formValues } = await Swal.fire({
+                const { value: result } = await Swal.fire({
                     title: title,
                     html:msg,
                     focusConfirm: false,
@@ -159,9 +173,23 @@
 
                     }
                 });
-                if (formValues) {
-                    Swal.fire(JSON.stringify(formValues));
+                if (result){
+                    if (result.dismiss !== Swal.DismissReason.cancel){
+                        if (result.value !== ""){
+                            if (c.callback !== undefined) {
+                                c.callback(result);
+
+
+                            }
+                        }else{
+                            c.callback(false);
+                        }
+
+                    }else{
+                        c.callback(false);
+                    }
                 }
+
             }
             return {
                 toast:toast,

@@ -9,9 +9,11 @@
 .datepicker{
     z-index: 100000;
     position: static;
+
 }
 .swal2-popup{
     width:700px;
+
 }
 
 .room-image{
