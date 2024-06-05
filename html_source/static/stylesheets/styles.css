@@ -1,0 +1,19 @@
+.my-footer{
+    background-color: dimgray;
+    padding:1.5em;
+    margin-top:1.5em;
+    color:whitesmoke;
+    height:5em;
+    font-size: 1.5em;
+}
+.datepicker{
+    z-index: 100000;
+    position: static;
+}
+.swal2-popup{
+    width:700px;
+}
+
+.nav{
+    z-index: 0;
+}
