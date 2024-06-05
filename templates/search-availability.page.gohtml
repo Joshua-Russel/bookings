@@ -1,0 +1,48 @@
+{{template "base" .}}
+    {{define "css"}}
+        <style>
+            .datepicker{
+                position:absolute;
+            }
+
+        </style>
+
+    {{end}}
+{{define "content"}}
+
+    <div class="container" >
+        <div class="row" >
+            <div class="col-md-6 offset-md-3 mt-5" >
+                <form action="/srch-availability" class="needs-validation" method="post" novalidate>
+                    <input type="hidden" name="csrf_token" value={{.CSRFToken}}>
+                    <div class="row" id="reservation-date">
+                        <h1>Search for Availability</h1>
+                        <div class="col mb-3" >
+                            <label class="form-label" for="start_date">Check In Date</label>
+                            <input aria-describedby="startDateHelp" class="form-control" id="start_date" name="start_date" placeholder="Check In" required type="text">
+
+                        </div >
+                        <div class="col mb-3" >
+                            <label class="form-label" for="end_date">Check Out Date</label>
+                            <input aria-describedby="endDateHelp" class="form-control" id="end_date" name="end_date" placeholder="Check Out" required type="text">
+
+                        </div >
+                    </div>
+                    <button class="btn btn-primary" type="submit">Search Availability</button>
+                </form>
+            </div >
+        </div >
+    </div>
+
+
+{{end}}
+{{define "js"}}
+
+    <script>
+        const elem = document.getElementById('reservation-date');
+        const rangepicker = new DateRangePicker(elem, {
+            // ...options
+            format:"dd-mm-yyyy"
+        })
+    </script>
+{{end}}

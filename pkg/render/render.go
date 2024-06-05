@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/Joshua-Russel/bookings/pkg/config"
 	"github.com/Joshua-Russel/bookings/pkg/models"
+	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,13 +16,14 @@ var app *config.AppConfig
 func NewTemplate(conf *config.AppConfig) {
 	app = conf
 }
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+func AddDefaultData(r *http.Request, td *models.TemplateData) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
-func RenderTemplate(res http.ResponseWriter, file string, tmpldata *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, file string, tmpldata *models.TemplateData) {
 	//renderedFile, _ := template.ParseFiles("./templates/"+file, "./templates/base.layout.gohtml")
-	//err := renderedFile.Execute(res, nil)
+	//err := renderedFile.Execute(w, nil)
 	//if err != nil {
 	//	fmt.Println("error", err)
 	//}
@@ -37,13 +39,13 @@ func RenderTemplate(res http.ResponseWriter, file string, tmpldata *models.Templ
 		log.Fatal("cannot read template from map")
 	}
 	buff := new(bytes.Buffer)
-	tmpldata = AddDefaultData(tmpldata)
+	tmpldata = AddDefaultData(r, tmpldata)
 	err := tmpl.Execute(buff, tmpldata)
 	if err != nil {
 		log.Println(err)
 	}
 	//_, err = buff.WriteTo(os.Stdout)
-	_, err = buff.WriteTo(res)
+	_, err = buff.WriteTo(w)
 
 	if err != nil {
 		log.Println(err)
@@ -87,7 +89,7 @@ func CreateTemplate() (map[string]*template.Template, error) {
 
 //var tempcache = make(map[string]*template.Template)
 
-//func RenderTemplate(res http.ResponseWriter, file string) {
+//func RenderTemplate(w http.ResponseWriter, file string) {
 //	var err error
 //	_, inMap := tempcache[file]
 //
@@ -102,7 +104,7 @@ func CreateTemplate() (map[string]*template.Template, error) {
 //		log.Println("using cached template")
 //	}
 //	tmpl := tempcache[file]
-//	err = tmpl.Execute(res, nil)
+//	err = tmpl.Execute(w, nil)
 //	if err != nil {
 //		log.Println("error", err)
 //	}
