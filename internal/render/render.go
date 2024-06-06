@@ -2,8 +2,8 @@ package render
 
 import (
 	"bytes"
-	"github.com/Joshua-Russel/bookings/pkg/config"
-	"github.com/Joshua-Russel/bookings/pkg/models"
+	"github.com/Joshua-Russel/bookings/internal/config"
+	"github.com/Joshua-Russel/bookings/internal/models"
 	"github.com/justinas/nosurf"
 	"html/template"
 	"log"

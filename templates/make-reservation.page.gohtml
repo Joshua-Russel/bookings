@@ -5,15 +5,21 @@
             <div class="offset-md-3 col-md-6">
                 <h1>Make Reservation</h1>
                 <form
-                        action="/srch-availability"
-                        class="needs-validation"
+                        action="/make-reservation"
+                        class=""
                         method="post"
                         novalidate
                 >
+                    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <div class="form-group mt-3">
                         <label class="form-label" for="first_name">First Name</label>
+                        {{with .Form.Errors.Get "first_name"}}
+                            <label for="error" class="text-danger">
+                                {{.}}
+                            </label>
+                                {{end}}
                         <input autocomplete="off"
-                               class="form-control"
+                               class="form-control {{with .Form.Errors.Get "first_name"}} is-invalid {{end}} "
                                id="first_name"
                                name="first_name"
                                required

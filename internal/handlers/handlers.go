@@ -3,9 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Joshua-Russel/bookings/pkg/config"
-	"github.com/Joshua-Russel/bookings/pkg/models"
-	"github.com/Joshua-Russel/bookings/pkg/render"
+	"github.com/Joshua-Russel/bookings/internal/config"
+	"github.com/Joshua-Russel/bookings/internal/forms"
+	"github.com/Joshua-Russel/bookings/internal/models"
+	"github.com/Joshua-Russel/bookings/internal/render"
 	"log"
 	"net/http"
 )
@@ -42,7 +43,34 @@ func (repo *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "generals.page.gohtml", &models.TemplateData{})
 }
 func (repo *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+func (repo *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	reservation := models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Phone:     r.Form.Get("phone"),
+		Email:     r.Form.Get("email"),
+	}
+
+	form := forms.New(r.PostForm)
+	form.Has("first_name", r)
+	if !form.IsValid() {
+		data := make(map[string]interface{})
+		data["reservation"] = reservation
+		render.RenderTemplate(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+	}
+	return
 }
 
 func (repo *Repository) Contact(w http.ResponseWriter, r *http.Request) {
