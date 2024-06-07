@@ -16,6 +16,12 @@
 
 }
 
+.nav-bar{
+    z-index:400;
+}
+.notie-container{
+    z-index: 500;
+}
 .room-image{
     max-width: 50%;
 }

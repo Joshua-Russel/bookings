@@ -18,7 +18,7 @@
     </head>
     <body>
 
-    <nav class="nav navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="nav-bar navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Navbar</a>
             <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
@@ -97,6 +97,34 @@
         }, false)
         })
         })()
+
+
+            // function notify(title,text,icon,confirmText) {
+            //     Swal.fire({
+            //         title: title,
+            //         text: text,
+            //         icon: icon,
+            //         confirmButtonText: confirmText,
+            //         position:"top-end"
+            //     })
+            // }
+            function notify(msg,type){
+                notie.alert({
+                    type:type,
+                    text:msg,
+                })
+            }
+    {{with .Error}}
+    notify("{{.}}","error")
+    {{end}}
+
+    {{with .Flash}}
+    notify("{{.}}" ,"success")
+    {{end}}
+
+    {{with .Warning}}
+        notify("{{.}}","warning")
+            {{end}}
     </script>
 
     </body>
