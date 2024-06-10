@@ -3,7 +3,6 @@ package forms
 import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -39,7 +38,7 @@ func (f *Form) Required(fields ...string) {
 		}
 	}
 }
-func (f *Form) MaxLength(field string, length int, r *http.Request) bool {
+func (f *Form) MinLength(field string, length int) bool {
 	value := f.Get(field)
 	if len(value) < length {
 		f.Errors.Add(field, fmt.Sprintf("Must be at least %d characters long", length))

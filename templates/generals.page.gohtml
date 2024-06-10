@@ -29,27 +29,28 @@
 
 
 {{end}}
+
 {{define "js"}}
     <script>
-        const attention=Prompt();
+
         const btn =document.getElementById("sample")
         btn.addEventListener('click',function(){
-            // notify("error","warning","error","OK")
+
             const html = `
 
            <form action="" class="needs-validation" novalidate id="check-availability-form" method="post">
                 <div class="row mb-3">
                     <div class="col">
-                    <h1>Choose your dates</h1>
+
                         <div class="row px-5 pt-3"  id="reservation-dates-modal">
                             <div class="col">
 
-                                <input disabled class="form-control" id="start" name="start" placeholder="Check In" required type="text">
+                                <input class="form-control" id="start" name="start" placeholder="Check In" required type="text">
 
                             </div>
                             <div class="col">
 
-                                <input disabled class="form-control" id="end" name="end" placeholder="Check Out" required type="text">
+                                <input class="form-control" id="end" name="end" placeholder="Check Out" required type="text">
                             </div>
 
 
@@ -58,120 +59,7 @@
                 </div>
         </form>
                 `
-            attention.datePicker({msg:html});
+            attention.datePicker({title:"Choose Your Dates",msg:html});
         })
-        // function notify(title,text,icon,confirmText) {
-        //     Swal.fire({
-        //         title: title,
-        //         text: text,
-        //         icon: icon,
-        //         confirmButtonText: confirmText,
-        //         position:"top-end"
-        //     })
-        // }
-        // function notify(msg,type){
-        //     notie.alert({
-        //         type:type,
-        //         text:msg,
-        //     })
-        // }
-
-        function Prompt(){
-            const toast=function(toastObj){
-                const {
-                    msg="",
-                    icon="success",
-                    position="top-end",
-                }=toastObj;
-                const Toast = Swal.mixin({
-                    toast: true,
-                    icon:icon,
-                    position: position,
-                    title: msg,
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({});
-            }
-            const success=function(successObj){
-                const {
-                    msg="",
-                    text='',
-                    footer="",
-                }=successObj;
-
-
-                Swal.fire({
-                    icon: "success",
-                    title: msg,
-                    text: text,
-                    footer: footer,
-                });
-            }
-            const error=function(errorObj){
-                const {
-                    msg="",
-                    text='',
-                    footer="",
-                }=errorObj;
-
-
-                Swal.fire({
-                    icon: "error",
-                    title: msg,
-                    text: text,
-                    footer: footer,
-                });
-            }
-            const datePicker=async function(c){
-                const {
-                    msg="",
-                    title="",
-                }=c;
-                const { value: formValues } = await Swal.fire({
-                    title: title,
-                    html:msg,
-                    focusConfirm: false,
-                    backdrop:false,
-                    showCancelButton:true,
-                    willOpen:()=>{
-                        const elem=document.getElementById("reservation-dates-modal");
-                        const range = new DateRangePicker(elem,{
-                            format:"dd-mm-yyyy",
-                            showOnFocus:true,
-                        })
-                    },
-                    preConfirm: () => {
-                        return [
-                            document.getElementById("start").value,
-                            document.getElementById("end").value
-                        ];
-                    },
-                    didOpen:()=>{
-                        document.getElementById("start").removeAttribute("disabled");
-                        document.getElementById("end").removeAttribute("disabled");
-
-                    }
-                });
-                if (formValues) {
-                    Swal.fire(JSON.stringify(formValues));
-                }
-            }
-            return {
-                toast:toast,
-                success:success,
-                error:error,
-                datePicker
-            }
-        }
-
-
-    </script>
-
-
+        </script>
 {{end}}

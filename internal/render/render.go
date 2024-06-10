@@ -2,6 +2,8 @@ package render
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"github.com/Joshua-Russel/bookings/internal/config"
 	"github.com/Joshua-Russel/bookings/internal/models"
 	"github.com/justinas/nosurf"
@@ -10,6 +12,10 @@ import (
 	"net/http"
 	"path/filepath"
 )
+
+var functions = template.FuncMap{}
+
+var pathToTemplates = "./templates"
 
 var app *config.AppConfig
 
@@ -24,12 +30,13 @@ func AddDefaultData(r *http.Request, td *models.TemplateData) *models.TemplateDa
 	return td
 }
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, file string, tmpldata *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, file string, tmpldata *models.TemplateData) error {
 	//renderedFile, _ := template.ParseFiles("./templates/"+file, "./templates/base.layout.gohtml")
 	//err := renderedFile.Execute(w, nil)
 	//if err != nil {
 	//	fmt.Println("error", err)
 	//}
+
 	var tmplcache map[string]*template.Template
 	if app.UseCache {
 		tmplcache = app.TmplCache
@@ -39,27 +46,29 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, file string, tmpldat
 
 	tmpl, isThere := tmplcache[file]
 	if !isThere {
-		log.Fatal("cannot read template from map")
+		//log.Fatal("cannot read template from map")
+		return errors.New("cannot read template from map")
 	}
 	buff := new(bytes.Buffer)
 	tmpldata = AddDefaultData(r, tmpldata)
 	err := tmpl.Execute(buff, tmpldata)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	//_, err = buff.WriteTo(os.Stdout)
 	_, err = buff.WriteTo(w)
 
 	if err != nil {
 		log.Println(err)
+		return err
 
 	}
-
+	return nil
 }
 
 func CreateTemplate() (map[string]*template.Template, error) {
 	tmplcache := map[string]*template.Template{}
-	filenames, err := filepath.Glob("./templates/*.page.gohtml")
+	filenames, err := filepath.Glob(fmt.Sprintf("%s/*.page.gohtml", pathToTemplates))
 	if err != nil {
 		log.Println("error", err)
 		return tmplcache, err
@@ -67,18 +76,18 @@ func CreateTemplate() (map[string]*template.Template, error) {
 	for _, name := range filenames {
 		filename := filepath.Base(name)
 
-		tmpl, err := template.New(filename).ParseFiles("./" + name)
+		tmpl, err := template.New(filename).Funcs(functions).ParseFiles(name)
 
 		if err != nil {
 			log.Println("error", err)
 			return tmplcache, err
 		}
-		matches, err := filepath.Glob("./templates/*.layout.gohtml")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplates))
 		if err != nil {
 			return tmplcache, err
 		}
 		if len(matches) > 0 {
-			tmpl, err = tmpl.ParseGlob("./templates/*.layout.gohtml")
+			tmpl, err = tmpl.ParseGlob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplates))
 
 			if err != nil {
 				return tmplcache, err
@@ -115,7 +124,7 @@ func CreateTemplate() (map[string]*template.Template, error) {
 //}
 //func createTemplate(file string) error {
 //	templates := []string{
-//		fmt.Sprintf("./templates/%s", file),
+//		fmt.Sprintf("%s/%s", file),
 //		"./templates/base.layout.gohtml",
 //	}
 //	tmpl, err := template.ParseFiles(templates...)
