@@ -11,5 +11,6 @@ type AppConfig struct {
 	TmplCache    map[string]*template.Template
 	InProduction bool
 	InfoLog      *log.Logger
+	ErrorLog     *log.Logger
 	Session      *scs.SessionManager
 }

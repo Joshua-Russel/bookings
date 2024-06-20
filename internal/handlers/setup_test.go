@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/Joshua-Russel/bookings/internal/config"
+	"github.com/Joshua-Russel/bookings/internal/helpers"
 	"github.com/Joshua-Russel/bookings/internal/models"
 	"github.com/Joshua-Russel/bookings/internal/render"
 	"github.com/alexedwards/scs/v2"
@@ -13,6 +14,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -28,6 +30,12 @@ func getRoutes() http.Handler {
 
 	// change this to true when in production
 	app.InProduction = false
+
+	infoLog := log.New(os.Stdout, "INFO \t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR \t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	// set up the session
 	session = scs.New()
@@ -49,6 +57,7 @@ func getRoutes() http.Handler {
 	repo := NewRepo(&app)
 	NewHandlers(repo)
 	render.NewTemplate(&app)
+	helpers.Newhelpers(&app)
 
 	mux := chi.NewRouter()
 
