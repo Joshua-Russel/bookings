@@ -19,7 +19,7 @@ var pathToTemplates = "./templates"
 
 var app *config.AppConfig
 
-func NewTemplate(conf *config.AppConfig) {
+func NewRenderer(conf *config.AppConfig) {
 	app = conf
 }
 func AddDefaultData(r *http.Request, td *models.TemplateData) *models.TemplateData {
@@ -30,7 +30,7 @@ func AddDefaultData(r *http.Request, td *models.TemplateData) *models.TemplateDa
 	return td
 }
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, file string, tmpldata *models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, file string, tmpldata *models.TemplateData) error {
 	//renderedFile, _ := template.ParseFiles("./templates/"+file, "./templates/base.layout.gohtml")
 	//err := renderedFile.Execute(w, nil)
 	//if err != nil {

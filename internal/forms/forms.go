@@ -22,14 +22,6 @@ func New(data url.Values) *Form {
 	}
 }
 
-//	func (f *Form) Has(field string, r *http.Request) bool {
-//		fv := r.Form.Get(field)
-//		if fv == "" {
-//			f.Errors.Add(field, "This field is Required")
-//			return false
-//		}
-//		return true
-//	}
 func (f *Form) Required(fields ...string) {
 	for _, field := range fields {
 		value := f.Get(field)

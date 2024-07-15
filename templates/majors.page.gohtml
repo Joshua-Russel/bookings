@@ -65,19 +65,31 @@
                 callback:function(result){
                     const form=document.getElementById("check-availability-form")
                     const formData=new FormData(form)
-                    formData.append("csrf_token","{{.CSRFToken}}")
+                    formData.append("csrf_token","{{.CSRFToken}}");
+                    formData.append("room_id","2");
+
                     fetch("/srch-availability-json",{
                         method:"post",
                         body:formData,
                     })
                         .then(request => request.json())
-                        .then(data => console.log(data))
+                        .then(data => {
+
+                            if (data.ok){
+
+                                console.log(data,"available")
+                            }
+                            else{
+                                console.log("unavailable")
+                            }
+                        })
                 },
                 willOpen:()=>{
                     const elem=document.getElementById("reservation-dates-modal");
                     const range = new DateRangePicker(elem,{
-                        format:"dd-mm-yyyy",
+                        format:"yyyy-mm-dd",
                         showOnFocus:true,
+                        minDate:new Date(),
                     })
                 },
                 didOpen:() => {

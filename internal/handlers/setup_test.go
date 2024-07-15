@@ -27,6 +27,9 @@ var functions = template.FuncMap{}
 func getRoutes() http.Handler {
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.RoomRestriction{})
+	gob.Register(models.Room{})
+	gob.Register(models.User{})
 
 	// change this to true when in production
 	app.InProduction = false
@@ -56,7 +59,7 @@ func getRoutes() http.Handler {
 
 	repo := NewRepo(&app)
 	NewHandlers(repo)
-	render.NewTemplate(&app)
+	render.NewRenderer(&app)
 	helpers.Newhelpers(&app)
 
 	mux := chi.NewRouter()

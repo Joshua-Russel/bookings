@@ -3,22 +3,35 @@
     <div class="container">
         <div class="row">
             <div class="offset-md-3 col-md-6">
+                {{$res := index .Data "reservation"}}
                 <h1>Make Reservation</h1>
+                <p>
+                    <strong>Reservation Details</strong><br>
+                    Room Name : {{$res.Room.RoomName}} <br>
+                    Arrival : {{index .StringMap "start_date"}} <br>
+                    Departure : {{index .StringMap "end_date"}}
+                </p>
+
                 <form
                         action="/make-reservation"
                         class=""
                         method="post"
                         novalidate
+
                 >
-                    {{$res := index .Data "reservation"}}
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                    <input type="hidden" name="start_date" value="{{index .StringMap "start_date"}}">
+                    <input type="hidden" name="end_date" value="{{index .StringMap "end_date"}}">
+                    <input type="hidden" name="room_id" value="{{$res.RoomID}}">
+
+
                     <div class="form-group mt-3">
                         <label class="form-label" for="first_name">First Name</label>
                         {{with .Form.Errors.Get "first_name"}}
                             <label for="error" class="text-danger">
                                 {{.}}
                             </label>
-                                {{end}}
+                        {{end}}
                         <input autocomplete="off"
                                class="form-control {{with .Form.Errors.Get "first_name"}} is-invalid {{end}} "
                                id="first_name"
@@ -44,6 +57,7 @@
                                value="{{$res.LastName}}"
                         />
                     </div>
+
                     <div class="form-group mt-3">
                         <label class="form-label " for="email">Email</label>
                         {{with .Form.Errors.Get "email"}}
