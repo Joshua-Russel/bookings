@@ -38,7 +38,7 @@
 
             const html = `
 
-           <form action="" class="needs-validation" novalidate id="check-availability-form" method="post">
+           <form action="" class="needs-validation" novalidate id="check-availability-form" method="post" >
                 <div class="row mb-3">
                     <div class="col">
                         <div class="row px-5 pt-3"  id="reservation-dates-modal">
@@ -59,7 +59,7 @@
         </form>
                 `
 
-            attention.datePicker({
+            attention.custom({
                 msg:html,
                 title:"Choose your dates",
                 callback:function(result){
@@ -74,10 +74,23 @@
                     })
                         .then(request => request.json())
                         .then(data => {
-
                             if (data.ok){
 
-                                console.log(data,"available")
+                                attention.custom({
+                                    icon: 'success',
+                                    msg:'<p>Room is available</p>'
+                                         +   '<p><a href="/book-room?id='
+                                        +   data.roomId
+                                        +   '&s='
+                                        + data.startDate
+                                        + '&e='
+                                        +data.endDate
+                                        +'"  class = "btn btn-primary">'
+                                        + 'Book now</a></p>',
+
+                                    showConfirmButton:false,
+
+                                })
                             }
                             else{
                                 console.log("unavailable")

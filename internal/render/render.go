@@ -5,15 +5,22 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Joshua-Russel/bookings/internal/config"
+	"github.com/Joshua-Russel/bookings/internal/helpers"
 	"github.com/Joshua-Russel/bookings/internal/models"
 	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
+	"time"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate":  HumanDate,
+	"formatDate": FormatDate,
+	"iterate":    Iterate,
+	"add":        Add,
+}
 
 var pathToTemplates = "./templates"
 
@@ -22,11 +29,33 @@ var app *config.AppConfig
 func NewRenderer(conf *config.AppConfig) {
 	app = conf
 }
+
+func HumanDate(t time.Time) string {
+
+	return t.Format("2006-01-02")
+}
+func FormatDate(t time.Time, f string) string {
+	return t.Format(f)
+}
+func Iterate(count int) []int {
+	var intArr []int
+	for i := 0; i < count; i++ {
+		intArr = append(intArr, i)
+	}
+	return intArr
+}
+
+func Add(a, b int) int {
+	return a + b
+}
 func AddDefaultData(r *http.Request, td *models.TemplateData) *models.TemplateData {
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
 	td.CSRFToken = nosurf.Token(r)
+	if helpers.IsAuthenticated(r) {
+		td.IsAuthenticated = 1
+	}
 	return td
 }
 

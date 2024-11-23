@@ -32,25 +32,23 @@
 
 {{define "js"}}
     <script>
-
         const btn =document.getElementById("sample")
-        btn.addEventListener('click',function(){
+        btn.addEventListener('click',function() {
 
             const html = `
 
            <form action="" class="needs-validation" novalidate id="check-availability-form" method="post">
                 <div class="row mb-3">
                     <div class="col">
-
                         <div class="row px-5 pt-3"  id="reservation-dates-modal">
                             <div class="col">
 
-                                <input class="form-control" id="start" name="start" placeholder="Check In" required type="text">
+                                <input disabled class="form-control" id="start" name="start" placeholder="Check In" required type="text">
 
                             </div>
                             <div class="col">
 
-                                <input class="form-control" id="end" name="end" placeholder="Check Out" required type="text">
+                                <input disabled class="form-control" id="end" name="end" placeholder="Check Out" required type="text">
                             </div>
 
 
@@ -59,7 +57,59 @@
                 </div>
         </form>
                 `
-            attention.datePicker({title:"Choose Your Dates",msg:html});
+
+            attention.custom({
+                msg:html,
+                title:"Choose your dates",
+                callback:function(result){
+                    const form=document.getElementById("check-availability-form")
+                    const formData=new FormData(form)
+                    formData.append("csrf_token","{{.CSRFToken}}");
+                    formData.append("room_id","1");
+
+                    fetch("/srch-availability-json",{
+                        method:"post",
+                        body:formData,
+                    })
+                        .then(request => request.json())
+                        .then(data => {
+                            if (data.ok){
+
+                                attention.custom({
+                                    icon: 'success',
+                                    msg:'<p>Room is available</p>'
+                                        +   '<p><a href="/book-room?id='
+                                        +   data.roomId
+                                        +   '&s='
+                                        + data.startDate
+                                        + '&e='
+                                        +data.endDate
+                                        +'"  class = "btn btn-primary">'
+                                        + 'Book now</a></p>',
+
+                                    showConfirmButton:false,
+
+                                })
+                            }
+                            else{
+                                console.log("unavailable")
+                            }
+                        })
+                },
+                willOpen:()=>{
+                    const elem=document.getElementById("reservation-dates-modal");
+                    const range = new DateRangePicker(elem,{
+                        format:"yyyy-mm-dd",
+                        showOnFocus:true,
+                        minDate:new Date(),
+                    })
+                },
+                didOpen:() => {
+                    document.getElementById("start").removeAttribute("disabled");
+                    document.getElementById("end").removeAttribute("disabled");
+                }
+            });
+
         })
         </script>
 {{end}}

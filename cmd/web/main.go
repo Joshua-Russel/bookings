@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"github.com/Joshua-Russel/bookings/internal/config"
 	"github.com/Joshua-Russel/bookings/internal/driver"
@@ -30,6 +31,9 @@ func main() {
 	}
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+	listenForMail()
+
 	fmt.Println(fmt.Sprintf("Serving on port %s", portNum))
 
 	serve := &http.Server{
@@ -51,6 +55,27 @@ func run() (*driver.DB, error) {
 	gob.Register(models.Room{})
 	gob.Register(models.RoomRestriction{})
 	gob.Register(models.User{})
+	gob.Register(map[string]int{})
+
+	//flags
+	inProduction := flag.Bool("production", false, "Application in production mode")
+	useCache := flag.Bool("cache", false, "Use template caches")
+	dbHost := flag.String("dbhost", "localhost", "Database host")
+	dbPort := flag.String("dbport", "5432", "Database port")
+	dbName := flag.String("dbname", "", "Database name")
+	dbUser := flag.String("dbuser", "", "Database user")
+	dbPass := flag.String("dbpass", "", "Database password")
+	dbSSL := flag.String("dbssl", "disable", "Database SSL mode (disable, prefer, require)")
+
+	flag.Parse()
+
+	if *dbName == "" || *dbUser == "" {
+		fmt.Println("Missing required flags")
+		os.Exit(1)
+	}
+
+	mailchan := make(chan models.MailData)
+	app.MailChan = mailchan
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -60,7 +85,9 @@ func run() (*driver.DB, error) {
 	app.Session = session
 
 	log.Println("Connecting to database ... ")
-	db, err := driver.ConnectSQL("host=localhost user=joshua dbname=bookings password=joshua port=5432 ")
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s sslmode=%s ",
+		*dbHost, *dbUser, *dbName, *dbPass, *dbPort, *dbSSL)
+	db, err := driver.ConnectSQL(connectionString)
 	if err != nil {
 		log.Fatalf("cannot connect to DB ....%v", err)
 	}
@@ -72,8 +99,8 @@ func run() (*driver.DB, error) {
 		return nil, err
 	}
 	app.TmplCache = tempSet
-	app.UseCache = false
-	app.InProduction = false
+	app.UseCache = *useCache
+	app.InProduction = *inProduction
 
 	render.NewRenderer(&app)
 	repo := handlers.NewRepo(&app, db)
